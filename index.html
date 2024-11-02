@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitação de Localização</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocalização não é suportada por este navegador.");
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Enviar a localização para o servidor Flask
+            fetch('http://localhost:5000/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Usuário negou a solicitação de Geolocalização.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informação de localização não disponível.");
+                    break;
+                case error.TIMEOUT:
+                    alert("A solicitação para obter a localização expirou.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Um erro desconhecido ocorreu.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Clique na Imagem para Compartilhar sua Localização</h1>
+    <img src="sua-imagem.jpg" alt="Imagem" onclick="getLocation()" style="cursor: pointer;">
+</body>
+</html>
